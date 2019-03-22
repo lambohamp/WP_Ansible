@@ -10,6 +10,6 @@ Vagrantfile - config for Vagrant
 
 # Usage:
 
-Download WordPress files and place them to the same directory with wp.yml, vars.yml and Vagrantfile. Edit the vars.yml to suit your needs and run the command below:
+Download WordPress files and place them to the same directory with wp.yml, vars.yml and Vagrantfile. Edit vars.yml to suit your needs and run the command below:
 
 sudo vagrant up
