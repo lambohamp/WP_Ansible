@@ -1,0 +1,96 @@
+---
+- hosts:              db
+  become:             yes
+  gather_facts:       no
+  vars_files:
+    - vars.yml
+  tasks:
+    - name:           "Install MySQL"
+      apt:
+        name:         "{{packages}}"
+        state:        latest
+        update_cache: yes
+      vars:
+        packages:
+        - mysql-server
+        - python-mysqldb
+    - name:           "Remove all anonymous user accounts"
+      mysql_user:
+        name:         ''
+        host_all:     yes
+        state:        absent
+    - name:           "Create DB"
+      mysql_db:
+        name:         wp
+        state:        present
+    - name:           "Copy database dump file"
+      copy:
+        src:          ./wordpress3.sql
+        dest:         /tmp
+    - name:           "Restore database"
+      mysql_db:
+        name:         "{{ mysql_db }}"
+        state:        import
+        target:       /tmp/wordpress3.sql
+    - name:           "Create user"
+      mysql_user:
+        name:         "{{ mysql_user }}"
+        password:     "{{ mysql_pass }}"
+        host:         '%'
+        priv:         'wp.*:ALL'
+        state:        present
+    - name:           "Edit MySQL config to allow remote connections"
+      lineinfile:
+        path:         /etc/mysql/my.cnf
+        regexp:       '^bind-address'
+        line:         'bind-address = 0.0.0.0'
+    - name:           "Restart MySQL"
+      service:
+        name:         mysql
+        state:        restarted
+
+- hosts:              web
+  become:             yes
+  gather_facts:       no
+  vars_files:
+    - vars.yml
+  tasks:
+    - name:           "Adding PHP repo"
+      apt_repository:
+        repo:         ppa:ondrej/php
+    - name:           "Install Apache and PHP"
+      apt:
+        name:         "{{packages}}"
+        state:        latest
+        update_cache: yes
+      vars:
+        packages:
+        - apache2
+        - php
+        - libapache2-mod-php
+        - php-mysql
+    - name:           "Copy WP"
+      copy:
+        src:          ./wp.tar
+        dest:         /var/www/html
+    - name:           "Unarchive WP"
+      unarchive:
+        src:          /var/www/html/wp.tar
+        dest:         /var/www/html
+        remote_src:   yes
+    - name:           "Copying files"
+      shell:          'cd /var/www/html/wordpress3 && sudo mv * .. && mv index.html index.html_bk'
+    - name:           "Editing the wp-config.file"
+      lineinfile:
+        dest:         /var/www/html/wp-config.php
+        regexp:       "{{ item.regexp }}"
+        line:         "{{ item.line }}"
+      with_items:
+        - {'regexp': "define\\('DB_NAME', '(.)+'\\);", 'line': "define('DB_NAME', '{{ mysql_db }}');"}
+        - {'regexp': "define\\('DB_HOST', '(.)+'\\);", 'line': "define('DB_HOST', '{{ mysql_host }}');"}
+        - {'regexp': "define\\('DB_USER', '(.)+'\\);", 'line': "define('DB_USER', '{{ mysql_user }}');"}
+        - {'regexp': "define\\('DB_PASSWORD', '(.)+'\\);", 'line': "define('DB_PASSWORD', '{{ mysql_pass }}');"}
+    - name:           "Restart Apache"
+      service:
+        name:         apache2
+        state:        restarted
