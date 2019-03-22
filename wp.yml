@@ -79,7 +79,7 @@
         dest:         /var/www/html
         remote_src:   yes
     - name:           "Copying files"
-      shell:          'cd /var/www/html/wordpress3 && sudo mv * .. && mv index.html index.html_bk'
+      shell:          'cd /var/www/html && sudo mv ./wordpress3/* . && sudo mv index.html index.html_bk'
     - name:           "Editing the wp-config.file"
       lineinfile:
         dest:         /var/www/html/wp-config.php
