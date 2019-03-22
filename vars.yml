@@ -1,14 +1,8 @@
-wp_archive:         wp.tar
-wp_name:            wordpress3
-mysql_bind_address: 0.0.0.0
-mysql_dump:         wordpress3.sql
-mysql_db:           wp
-mysql_host:         192.168.10.11
-mysql_user:         admin
-mysql_pass:         !vault |
-          $ANSIBLE_VAULT;1.1;AES256
-          62633539656439666531306139336466653661333037346134373766663262336437633531356139
-          6633333039356234383766386461636462316535613037310a613864633339333262373464626661
-          39316161666537653363346238633836343331636439643539623362393936636135656430313263
-          3737383832306530630a303163326432306665663030616666613163613636333831373933346164
-          3665
+wp_archive:         example.tar # Can handle .zip files as well as .tar, .tar.gz, .tar.bz2 and .tar.xz files
+wp_name:            wordpress # Name of WordPress directory ('wordpress' by default)
+mysql_bind_address: 0.0.0.0 # IP address the MySQL server listens to
+mysql_dump:         example.sql # Name of .sql dump
+mysql_db:           randomdb # MySQL database name
+mysql_host:         192.168.10.11 # MySQL host
+mysql_user:         randomuser # MySQL username
+mysql_pass:         randompassword # MySQL username password
