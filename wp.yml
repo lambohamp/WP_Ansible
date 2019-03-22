@@ -21,29 +21,29 @@
         state:        absent
     - name:           "Create DB"
       mysql_db:
-        name:         wp
+        name:         "{{ mysql_db }}"
         state:        present
     - name:           "Copy database dump file"
       copy:
-        src:          ./wordpress3.sql
+        src:          ./{{ mysql_dump }}
         dest:         /tmp
     - name:           "Restore database"
       mysql_db:
         name:         "{{ mysql_db }}"
         state:        import
-        target:       /tmp/wordpress3.sql
+        target:       /tmp/{{ mysql_dump }}
     - name:           "Create user"
       mysql_user:
         name:         "{{ mysql_user }}"
         password:     "{{ mysql_pass }}"
         host:         '%'
-        priv:         'wp.*:ALL'
+        priv:         '{{ mysql_db }}.*:ALL'
         state:        present
     - name:           "Edit MySQL config to allow remote connections"
       lineinfile:
         path:         /etc/mysql/my.cnf
         regexp:       '^bind-address'
-        line:         'bind-address = 0.0.0.0'
+        line:         'bind-address = {{ mysql_bind_address }}'
     - name:           "Restart MySQL"
       service:
         name:         mysql
@@ -71,16 +71,17 @@
         - php-mysql
     - name:           "Copy WP"
       copy:
-        src:          ./wp.tar
+        src:          ./{{ wp_archive }}
         dest:         /var/www/html
     - name:           "Unarchive WP"
       unarchive:
-        src:          /var/www/html/wp.tar
+        src:          /var/www/html/{{ wp_archive }}
         dest:         /var/www/html
         remote_src:   yes
     - name:           "Copying files"
-      shell:          'cd /var/www/html && sudo mv ./wordpress3/* . && sudo mv index.html index.html_bk'
+      shell:          'cd /var/www/html && sudo mv ./{{ wp_name }}/* . && sudo mv index.html index.html_bk'
     - name:           "Editing the wp-config.file"
+      no_log: True
       lineinfile:
         dest:         /var/www/html/wp-config.php
         regexp:       "{{ item.regexp }}"
