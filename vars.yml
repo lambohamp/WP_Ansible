@@ -1,4 +1,4 @@
-wp_archive:         example.tar # Can handle .zip files as well as .tar, .tar.gz, .tar.bz2 and .tar.xz files
+wp_archive:         example.tar # Name of WordPress archive (.zip, .tar, .tar.gz, .tar.bz2 and .tar.xz)
 wp_name:            wordpress # Name of WordPress directory ('wordpress' by default)
 mysql_bind_address: 0.0.0.0 # IP address the MySQL server listens to
 mysql_dump:         example.sql # Name of .sql dump
