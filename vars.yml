@@ -1,7 +1,11 @@
-mysql_db:         wp
-mysql_host:       192.168.10.11
-mysql_user:       admin
-mysql_pass:       !vault |
+wp_archive:         wp.tar
+wp_name:            wordpress3
+mysql_bind_address: 0.0.0.0
+mysql_dump:         wordpress3.sql
+mysql_db:           wp
+mysql_host:         192.168.10.11
+mysql_user:         admin
+mysql_pass:         !vault |
           $ANSIBLE_VAULT;1.1;AES256
           62633539656439666531306139336466653661333037346134373766663262336437633531356139
           6633333039356234383766386461636462316535613037310a613864633339333262373464626661
